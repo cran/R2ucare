@@ -12,21 +12,39 @@
 group_data_gen <- function(X,effX, s){
 
 # sort data
-Y = cbind(X,effX)
+if (length(effX) == 1) {
+  Y <- t(matrix(c(X,effX)))
+} else {
+Y <- cbind(X,effX)
+}
+
 s = rev(s)
 for (i in s){
-    Y = Y[order(Y[,i]),]
-    }
+  if (nrow(Y) == 1) {
+    Y <- Y
+  } else {
+    Y <- Y[order(Y[,i]),]
+  }
+            }
 
 # pool data
+if (nrow(Y)==1){
+  res <- Y
+  return(res)
+}
+
+
+if (nrow(Y)>1){
 compteur = 0
 effY = Y[,ncol(Y)]
 Y = Y[,-ncol(Y)]
 i = 1
 while (i <= dim(Y)[1]){
 	j = i
-	while ((j <= dim(Y)[1])&&(sum(Y[i,]==Y[j,])==s)){
-		j = j+1
+	## while ((j <= dim(Y)[1])&&(sum(Y[i,]==Y[j,])==s)){
+	## 2022-07-05 compare only first element of s
+	while ((j <= dim(Y)[1])&&(sum(Y[i,]==Y[j,])==s[1])){
+	    j = j+1
 	}
    tot1 = sum((effY[i:(j-1)]>0) * effY[i:(j-1)])
    tot2 = sum((effY[i:(j-1)]<0) * effY[i:(j-1)])
@@ -45,7 +63,10 @@ while (i <= dim(Y)[1]){
 Y = Y[1:compteur,]
 effY = effY[1:compteur]
 res = cbind(Y,effY)
-res
+return(res)
 }
+}
+
+
 
 

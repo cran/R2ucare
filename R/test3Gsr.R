@@ -13,7 +13,7 @@
 #' # Read in Geese dataset:
 #' geese = system.file("extdata", "geese.inp", package = "R2ucare")
 #' geese = read_inp(geese)
-#' 
+#'
 #' # Get encounter histories and number of individuals with corresponding histories
 #' geese.hist = geese$encounter_histories
 #' geese.freq = geese$sample_size
@@ -56,20 +56,36 @@ for (i in 2:(k-1)){ # loop on date
                 next
             }
             batcheff = eff[masque] # select counts corresponding to encounter histories with l in column i
+
             res = group_data_gen(batch,batcheff,(i+1):k) # sort according to columns i+1,...,k
-            batchpost = res[,1:ncol(res)-1]
-            batcheffpost = res[,ncol(res)]
+            if (nrow(res)==1){
+              batchpost <- matrix(res[,1:ncol(res)-1],nrow=1)
+              batcheffpost <- res[,ncol(res)]
+            } else {
+              batchpost = res[,1:ncol(res)-1]
+              batcheffpost = res[,ncol(res)]
+            }
             # look site on which previous obs occurred
             if (i!=2){
-            		tt = t(apply(batchpost[,1:(i-1)],1,rev))
+              if (nrow(batchpost)==1){
+                tt = t(rev(batchpost[,1:(i-1)]))
                 eante = apply(tt!=0,1,which.max)
-                eante = i - eante
+              } else{
+                tt = t(apply(batchpost[,1:(i-1)],1,rev))
+                eante = apply(tt!=0,1,which.max)
+              }
+              eante = i - eante
             } else {
                 eante = rep(1,nrow(batchpost))
             }
+
             # on cherche le site d'observation suivant
             if (i!=(k-1)){
+              if (nrow(batchpost)==1){
+                epost = which.max(batchpost[,(i+1):k]!=0)
+              } else {
                 epost = apply(batchpost[,(i+1):k]!=0,1,which.max)
+              }
             } else {
                 epost = rep(1,nrow(batchpost))
             }
@@ -145,23 +161,20 @@ for (i in 2:(k-1)){ # loop on date
                 table_multi_3sr[where_in_table_3sr,5] = pvalfish
                 table_multi_3sr[where_in_table_3sr,6] = 'Fisher'
             } else {
-            	   	old.warn <- options()$warn # to suppress the warning messages
-            	   	options(warn = -1)
-            	   	chi2 = stats::chisq.test(compo3GSR,correct=F)
-            	   	options(warn = old.warn)
-                pvalchi2 = chi2$p.value
-                dfchi2 = chi2$parameter
-				stachi2 = chi2$statistic
-                table_multi_3sr[where_in_table_3sr,1] = i
-                table_multi_3sr[where_in_table_3sr,2] = l
-                table_multi_3sr[where_in_table_3sr,3] = stachi2
-                table_multi_3sr[where_in_table_3sr,4] = dfchi2
-                table_multi_3sr[where_in_table_3sr,5] = pvalchi2
-                table_multi_3sr[where_in_table_3sr,6] = 'Chi-square'
+              chi2 = suppressWarnings(stats::chisq.test(compo3GSR,correct=F))
+              pvalchi2 = chi2$p.value
+              dfchi2 = chi2$parameter
+              stachi2 = chi2$statistic
+              table_multi_3sr[where_in_table_3sr,1] = i
+              table_multi_3sr[where_in_table_3sr,2] = l
+              table_multi_3sr[where_in_table_3sr,3] = stachi2
+              table_multi_3sr[where_in_table_3sr,4] = dfchi2
+              table_multi_3sr[where_in_table_3sr,5] = pvalchi2
+              table_multi_3sr[where_in_table_3sr,6] = 'Chi-square'
             }
 
-        }
     }
+}
 # compute overall test:
 stat = sum(as.numeric(table_multi_3sr[,3]))
 stat = round(stat,rounding)

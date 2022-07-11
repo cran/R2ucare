@@ -10,7 +10,6 @@
 #' @export
 
 ind_test_22 <- function(M,threshold=2,rounding=3){
-
 # calculate margins, total, expected table
 MC = apply(M,2,sum)
 ML = apply(M,1,sum)
@@ -34,16 +33,16 @@ if (df>0){ # perform test
    res[3] = test_low
    if (test_low) {
    res[2] = stats::fisher.test(M)$p.value
+   if (abs(1 - res[2]) <= .Machine$double.eps){
+   res[2] <- 1 # If p-value is within machine precision of 1, then just set it to 1.
+   }
    res[1] = stats::qchisq(1-res[2],1)
    res[1] = round(res[1],rounding)
    res[2] = round(res[2],rounding)
    res[3] = round(sign(D[1,1]) * sqrt(res[1]),rounding)
    res[4] = 'Fisher'}
    else {
-   	old.warn <- options()$warn # to suppress the warning messages
-   	options(warn = -1)
-   	res.tempo = stats::chisq.test(M,correct=F)
-   options(warn = old.warn)
+     res.tempo = suppressWarnings(stats::chisq.test(M,correct=F))
    res[1] = res.tempo$statistic
    res[1] = round(res[1],rounding)
    res[2] = res.tempo$p.value

@@ -25,7 +25,7 @@ get the deviance (say dev_as and dev_jmv) and number of estimated parameters (sa
 Then, finally, the p-value of the goodness-of-fit test for the AS model is obtained as 1 - pchisq(stat_as,dof_as) where stat_as = stat_jmv + (dev_as - dev_jmv) and dof_as = dof_jmv + (dof_jmv - dof_as)
 }
 \examples{
-\dontrun{
+\donttest{
 # read in Geese dataset
 library(RMark)
 geese = system.file("extdata", "geese.inp", package = "R2ucare")
@@ -49,4 +49,3 @@ overall_JMV(X, freq)
 Olivier Gimenez <olivier.gimenez@cefe.cnrs.fr>, Roger Pradel, Rémi Choquet
 }
 \keyword{package}
-

@@ -22,7 +22,7 @@ This function returns a list with first component the overall test and second co
 This function performs TestM.ITEC
 }
 \examples{
-\dontrun{
+\donttest{
 # Read in Geese dataset:
 geese = system.file("extdata", "geese.inp", package = "R2ucare")
 geese = read_inp(geese)
@@ -39,4 +39,3 @@ testMitec(geese.hist,geese.freq)
 Olivier Gimenez <olivier.gimenez@cefe.cnrs.fr>, Rémi Choquet, Roger Pradel
 }
 \keyword{package}
-
